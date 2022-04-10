@@ -6,7 +6,7 @@
     Used for working with Florgon auth API.
 
     Current SDK version:
-        v1.0.0
+        v1.0
     Latest auth API version: 
         v1.0.1
 
