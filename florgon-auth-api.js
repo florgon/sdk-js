@@ -54,8 +54,8 @@ const authApiErrorCode = {
 
 // Methods wrapper.
 const authMethodUser = (accessToken, onSuccess=undefined, onError=undefined) => authApiRequest("user", "", accessToken, onSuccess, onError);
-const authMethodSignin = (login, password, onSuccess=undefined, onError=undefined) => authApiRequest("signin", "login=" + login + "&password=" + password, onSuccess, onError);
-const authMethodSignup = (username, email, password, onSuccess=undefined, onError=undefined) => authApiRequest("signup", "username=" + username + "&email=" + email + "&password=" + password, onSuccess, onError);
+const authMethodSignin = (login, password, onSuccess=undefined, onError=undefined) => authApiRequest("signin", "login=" + login + "&password=" + password, "", onSuccess, onError);
+const authMethodSignup = (username, email, password, onSuccess=undefined, onError=undefined) => authApiRequest("signup", "username=" + username + "&email=" + email + "&password=" + password, "", onSuccess, onError);
 
 function authApiRequest(method, params="", accessToken="", onSuccess=undefined, onError=undefined){
     /// @description Makes request to API method.
