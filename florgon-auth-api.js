@@ -6,7 +6,7 @@
     Used for working with Florgon auth API.
 
     Current SDK version:
-        v1.0
+        v1.0.1
     Latest auth API version: 
         v1.0.1
 
@@ -62,7 +62,7 @@ function authApiRequest(method, params="", accessToken="", onSuccess=undefined, 
     const onErrorHandler = function(raw, result){
         /// @description Error response handler.
         if (onError) onError(raw, result);
-        if ("v" in result){
+        if (result && "v" in result){
             if (result["v"] != AUTH_API_EXPECTED_VERSION){
                 console.warn("[Florgon auth API] Working with unexpected API version! Expected version: " + AUTH_API_EXPECTED_VERSION + ", but got: " + result["v"])
             }
@@ -72,7 +72,7 @@ function authApiRequest(method, params="", accessToken="", onSuccess=undefined, 
     const onSuccessHandler = function(raw, result){
         /// @description Success response handler.
         if (onSuccess) onSuccess(raw, result);
-        if ("v" in result){
+        if (result && "v" in result){
             if (result["v"] != AUTH_API_EXPECTED_VERSION){
                 console.warn("[Florgon auth API] Working with unexpected API version! Expected version: " + AUTH_API_EXPECTED_VERSION + ", but got: " + result["v"])
             }
