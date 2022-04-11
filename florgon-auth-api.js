@@ -6,9 +6,9 @@
     Used for working with Florgon auth API.
 
     Current SDK version:
-        v1.0.1
-    Latest auth API version: 
-        v1.0.1
+        v1.0.2
+    Expected auth API version: 
+        v1.0.2
 
     Source code:
         https://github.com/florgon/auth-sdk
@@ -22,7 +22,7 @@
 */
 
 // Settings.
-const AUTH_API_EXPECTED_VERSION = "1.0.1";
+const AUTH_API_EXPECTED_VERSION = "1.0.2";
 const AUTH_API_ENDPOINT_URL = "https://api.florgon.space/auth/v1/";
 const AUTH_API_HTTP_METHOD = "GET";
 const AUTH_API_DEFAULT_HEADERS = {
@@ -53,6 +53,7 @@ const authApiErrorCode = {
 }
 
 // Methods wrapper.
+const authMethodVerify = (accessToken, onSuccess=undefined, onError=undefined) => authApiRequest("verify", "", accessToken, onSuccess, onError);
 const authMethodUser = (accessToken, onSuccess=undefined, onError=undefined) => authApiRequest("user", "", accessToken, onSuccess, onError);
 const authMethodSignin = (login, password, onSuccess=undefined, onError=undefined) => authApiRequest("signin", "login=" + login + "&password=" + password, "", onSuccess, onError);
 const authMethodSignup = (username, email, password, onSuccess=undefined, onError=undefined) => authApiRequest("signup", "username=" + username + "&email=" + email + "&password=" + password, "", onSuccess, onError);
