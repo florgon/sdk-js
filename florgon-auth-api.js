@@ -6,9 +6,9 @@
     Used for working with Florgon auth API.
 
     Current SDK version:
-        v1.0.2
+        v1.0.3
     Expected auth API version: 
-        v1.0.2
+        v1.0.3
 
     Source code:
         https://github.com/florgon/auth-sdk
@@ -22,7 +22,7 @@
 */
 
 // Settings.
-const AUTH_API_EXPECTED_VERSION = "1.0.2";
+const AUTH_API_EXPECTED_VERSION = "1.0.3";
 const AUTH_API_ENDPOINT_URL = "https://api.florgon.space/auth/v1/";
 const AUTH_API_HTTP_METHOD = "GET";
 const AUTH_API_DEFAULT_HEADERS = {
@@ -161,5 +161,6 @@ export {
 
     authMethodUser,
     authMethodSignin,
-    authMethodSignup
+    authMethodSignup,
+    authMethodVerify
 };
