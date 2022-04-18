@@ -6,9 +6,9 @@
     Used for working with Florgon auth API.
 
     Current SDK version:
-        v1.0.3
+        v1.1.3
     Expected auth API version: 
-        v1.0.3
+        v1.1.3
 
     Source code:
         https://github.com/florgon/auth-sdk
@@ -22,7 +22,7 @@
 */
 
 // Settings.
-const AUTH_API_EXPECTED_VERSION = "1.0.3";
+const AUTH_API_EXPECTED_VERSION = "1.1.3";
 const AUTH_API_ENDPOINT_URL = "https://api.florgon.space/auth/v1/";
 const AUTH_API_HTTP_METHOD = "GET";
 const AUTH_API_DEFAULT_HEADERS = {
@@ -57,6 +57,8 @@ const authMethodVerify = (accessToken, onSuccess=undefined, onError=undefined) =
 const authMethodUser = (accessToken, onSuccess=undefined, onError=undefined) => authApiRequest("user", "", accessToken, onSuccess, onError);
 const authMethodSignin = (login, password, onSuccess=undefined, onError=undefined) => authApiRequest("signin", "login=" + login + "&password=" + password, "", onSuccess, onError);
 const authMethodSignup = (username, email, password, onSuccess=undefined, onError=undefined) => authApiRequest("signup", "username=" + username + "&email=" + email + "&password=" + password, "", onSuccess, onError);
+const authMethodEmailConfirm = (confirmationToken, onSuccess=undefined, onError=undefined) => authApiRequest("email/confirm", "cft=" + confirmationToken, "", onSuccess, onError);
+const authMethodEmailResendConfirmation = (accessToken, onSuccess=undefined, onError=undefined) => authApiRequest("email/resend_confirmation", "", accessToken, onSuccess, onError);
 
 function authApiRequest(method, params="", accessToken="", onSuccess=undefined, onError=undefined){
     /// @description Makes request to API method.
@@ -102,6 +104,9 @@ function authApiGetErrorMessageFromCode(code){
         case 31: return "auth-api-error-password-invalid" // AUTH_PASSWORD_INVALID
         case 32: return "auth-api-error-username-invalid" // AUTH_USERNAME_INVALID
         case 40: return "auth-api-error-invalid-request" // API_INVALID_REQUEST
+        case 50: return "auth-api-error-cft-invalid-token" // CFT_INVALID_TOKEN
+        case 51: return "auth-api-error-cft-email-not-found" // CFT_EMAIL_NOT_FOUND
+        case 52: return "auth-api-error-cft-email-already-confirmed" // CFT_EMAIL_ALREADY_CONFIRMED
         default: return "auth-api-error-unknown"; // Unknown error code.
     }
 }
@@ -162,5 +167,7 @@ export {
     authMethodUser,
     authMethodSignin,
     authMethodSignup,
-    authMethodVerify
+    authMethodVerify,
+    authMethodEmailConfirm,
+    authMethodEmailResendConfirmation
 };
