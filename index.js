@@ -119,8 +119,7 @@ function authApiRequest(method, params="", accessToken=""){
             }
         }
 
-        if ("success" in response) resolve(rawResponse, response);
-        reject(rawResponse, response)
+        resolve(rawResponse, response);
     });
 }
 
