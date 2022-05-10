@@ -6,7 +6,7 @@
     Used for working with Florgon auth API.
 
     Current SDK version:
-        v1.3.3
+        v3.3.4
     Expected auth API version: 
         v1.2.3
 
@@ -111,7 +111,7 @@ function authApiRequest(method, params="", accessToken=""){
             method: AUTH_API_HTTP_METHOD,
             headers: _getHeaders(accessToken=accessToken)
         }).catch(error => reject(error));
-        response = rawResponse.json().catch(error => reject(error));
+        response = await rawResponse.json().catch(error => reject(error));
 
         if (response && "v" in response){
             if (response["v"] != AUTH_API_EXPECTED_VERSION){
