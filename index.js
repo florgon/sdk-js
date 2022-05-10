@@ -6,7 +6,7 @@
     Used for working with Florgon auth API.
 
     Current SDK version:
-        v1.2.3
+        v1.3.3
     Expected auth API version: 
         v1.2.3
 
@@ -104,32 +104,25 @@ function authApiRedirectOAuthAuthorization(clientId, redirectUri, responseType="
     window.location.href = authApiGetOAuthAuthorizationUrl(clientId, redirectUri, responseType, scope, state);
 }
 
-function authApiRequest(method, params="", accessToken="", onSuccess=undefined, onError=undefined){
+function authApiRequest(method, params="", accessToken=""){
     /// @description Makes request to API method.
-    const onErrorHandler = function(raw, result){
-        /// @description Error response handler.
-        if (onError) onError(raw, result);
-        if (result && "v" in result){
-            if (result["v"] != AUTH_API_EXPECTED_VERSION){
+    return new Promise(async (resolve, reject) => {
+        rawResponse = await fetch(_buildRequestURL(method, params), {
+            method: AUTH_API_HTTP_METHOD,
+            headers: _getHeaders(accessToken=accessToken)
+        }).catch(error => reject(error));
+        response = rawResponse.json().catch(error => reject(error));
+
+        if (response && "v" in response){
+            if (response["v"] != AUTH_API_EXPECTED_VERSION){
                 console.warn("[Florgon auth API] Working with unexpected API version! Expected version: " + AUTH_API_EXPECTED_VERSION + ", but got: " + result["v"])
             }
         }
-    }
 
-    const onSuccessHandler = function(raw, result){
-        /// @description Success response handler.
-        if (onSuccess) onSuccess(raw, result);
-        if (result && "v" in result){
-            if (result["v"] != AUTH_API_EXPECTED_VERSION){
-                console.warn("[Florgon auth API] Working with unexpected API version! Expected version: " + AUTH_API_EXPECTED_VERSION + ", but got: " + result["v"])
-            }
-        }
-    }
-
-    // Requesting API.
-    _apiRequestWrapper(method, params, onSuccessHandler, onErrorHandler, accessToken);
+        if ("success" in response) resolve(rawResponse, response);
+        reject(rawResponse, response)
+    });
 }
-
 
 function authApiGetErrorMessageFromCode(code){
     /// @description Returns translation message from code.
@@ -178,30 +171,7 @@ function _getHeaders(accessToken){
     return headers;
 }
 
-
-function _apiFetch(apiMethod, apiParams, accessToken){
-    /// @description Returns fetch for API.
-    return fetch(_buildRequestURL(apiMethod, apiParams), {
-        method: AUTH_API_HTTP_METHOD,
-        headers: _getHeaders(accessToken=accessToken)
-    })
-}
-
-
-function _apiRequestWrapper(apiMethod, apiParams, successHandler, errorHandler, accessToken){
-    /// @description Makes API request with given handlers.
-    _apiFetch(apiMethod, apiParams, accessToken).then(raw_response => {
-        // We got 200 OK.
-        raw_response.json().then(((response) => {
-            // We got valid JSON.
-            if ("success" in response) return successHandler(raw_response, response);
-            return errorHandler(raw_response, response);
-        })).catch((error) => errorHandler(raw_response, error))
-    }).catch(errorHandler);
-}
-
-
-export {
+module.exports = {
     authApiGetErrorMessageFromCode,
 
     authApiErrorCode,
