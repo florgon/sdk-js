@@ -6,7 +6,7 @@
     Used for working with Florgon auth API.
 
     Current SDK version:
-        v3.3.4
+        v4.0.0
     Expected auth API version: 
         v1.2.3
 
@@ -66,34 +66,24 @@ const authApiErrorCode = {
 
 // Methods wrapper.
 // Other.
-const authMethodChangelog = (onSuccess=undefined, onError=undefined) => authApiRequest("changelog", "", "", onSuccess, onError);
+const authMethodChangelog = () => authApiRequest("changelog", "", "");
 // User / token.
-const authMethodVerify = (accessToken, onSuccess=undefined, onError=undefined) => authApiRequest("verify", "", accessToken, onSuccess, onError);
-const authMethodUser = (accessToken, onSuccess=undefined, onError=undefined) => authApiRequest("user", "", accessToken, onSuccess, onError);
+const authMethodVerify = (accessToken) => authApiRequest("verify", "", accessToken);
+const authMethodUser = (accessToken) => authApiRequest("user", "", accessToken);
 // Sign-in/up
-const authMethodSignin = (login, password, onSuccess=undefined, onError=undefined) => authApiRequest("signin", "login=" + login + "&password=" + password, "", onSuccess, onError);
-const authMethodSignup = (username, email, password, onSuccess=undefined, onError=undefined) => {
-    authApiRequest("signup", "username=" + username + "&email=" + email + "&password=" + password, "", onSuccess, onError);
-}
+const authMethodSignin = (login, password) => authApiRequest("signin", "login=" + login + "&password=" + password, "");
+const authMethodSignup = (username, email, password) => authApiRequest("signup", "username=" + username + "&email=" + email + "&password=" + password, "");
 // Email.
-const authMethodEmailConfirm = (confirmationToken, onSuccess=undefined, onError=undefined) => authApiRequest("email/confirm", "cft=" + confirmationToken, "", onSuccess, onError);
-const authMethodEmailResendConfirmation = (accessToken, onSuccess=undefined, onError=undefined) => authApiRequest("email/resend_confirmation", "", accessToken, onSuccess, onError);
+const authMethodEmailConfirm = (confirmationToken) => authApiRequest("email/confirm", "cft=" + confirmationToken, "");
+const authMethodEmailResendConfirmation = (accessToken) => authApiRequest("email/resend_confirmation", "", accessToken);
 // OAuth.
-const authMethodOAuthAuthorize = (clientId, redirectUri, responseType, scope, state, onSuccess=undefined, onError=undefined) => {
-    authApiRequest("oauth/authorize", `client_id=${clientId}&state=${state}&redirect_uri=${redirectUri}&scope=${scope}&response_type=${responseType}`, "", onSuccess, onError);
-}
-const authMethodOAuthToken = (code, onSuccess=undefined, onError=undefined) => authApiRequest("oauth/token", "code=" + code, "", onSuccess, onError);
-const authMethodOAuthDirect = (clientId, clientSecret, username, email, password, onSuccess=undefined, onError=undefined) => {
-    authApiRequest("oauth/direct", `client_id=${clientId}&client_secret=${clientSecret}&username=${username}&email=${email}&password=${password}`, "", onSuccess, onError);
-}
+const authMethodOAuthAuthorize = (clientId, redirectUri, responseType, scope, state) => authApiRequest("oauth/authorize", `client_id=${clientId}&state=${state}&redirect_uri=${redirectUri}&scope=${scope}&response_type=${responseType}`, "");
+const authMethodOAuthToken = (code) => authApiRequest("oauth/token", "code=" + code, "");
+const authMethodOAuthDirect = (clientId, clientSecret, username, email, password) => authApiRequest("oauth/direct", `client_id=${clientId}&client_secret=${clientSecret}&username=${username}&email=${email}&password=${password}`, "");
 // OAuth client.
-const authMethodOAuthClientGet = (clientId, onSuccess=undefined, onError=undefined) => authApiRequest("oauth/client/get", "client_id=" + clientId, "", onSuccess, onError);
-const authMethodOAuthClientNew = (displayName, accessToken, onSuccess=undefined, onError=undefined) => {
-    authApiRequest("oauth/client/new", "display_name=" + displayName, accessToken, onSuccess, onError);
-}
-const authMethodOAuthClientExpire = (clientId, accessToken, onSuccess=undefined, onError=undefined) => {
-    authApiRequest("oauth/client/expire", "client_id=" + clientId, accessToken, onSuccess, onError);
-}
+const authMethodOAuthClientGet = (clientId) => authApiRequest("oauth/client/get", "client_id=" + clientId, "");
+const authMethodOAuthClientNew = (displayName, accessToken) => authApiRequest("oauth/client/new", "display_name=" + displayName, accessToken);
+const authMethodOAuthClientExpire = (clientId, accessToken) => authApiRequest("oauth/client/expire", "client_id=" + clientId, accessToken);
 
 // Getter for OAuth authorization url.
 // Use this for own redirect, or method below to direct redirect.
@@ -106,20 +96,15 @@ function authApiRedirectOAuthAuthorization(clientId, redirectUri, responseType="
 
 function authApiRequest(method, params="", accessToken=""){
     /// @description Makes request to API method.
-    return new Promise(async (resolve, reject) => {
-        rawResponse = await fetch(_buildRequestURL(method, params), {
-            method: AUTH_API_HTTP_METHOD,
-            headers: _getHeaders(accessToken=accessToken)
-        }).catch(error => reject(error));
-        response = await rawResponse.json().catch(error => reject(error));
-
-        if (response && "v" in response){
-            if (response["v"] != AUTH_API_EXPECTED_VERSION){
-                console.warn("[Florgon auth API] Working with unexpected API version! Expected version: " + AUTH_API_EXPECTED_VERSION + ", but got: " + result["v"])
-            }
-        }
-
-        resolve(rawResponse, response);
+    return new Promise((resolve, reject) => {
+        _apiFetch(method, params, accessToken).then((httpResponse) => {
+            httpResponse.json().then((jsonResponse) => {
+                _apiShowVersionWarn(jsonResponse);
+                
+                if ("success" in jsonResponse) resolve(jsonResponse, httpResponse);
+                reject(jsonResponse, httpResponse);
+            }).catch(reject);
+        }).catch(reject);
     });
 }
 
@@ -154,6 +139,23 @@ function authApiGetErrorMessageFromCode(code){
     Private methods, that should not be used by end-user.
 */
 
+function _apiFetch(apiMethod, apiParams, accessToken){
+    /// @description Returns fetch for API.
+    return fetch(_buildRequestURL(apiMethod, apiParams), {
+        method: AUTH_API_HTTP_METHOD,
+        headers: _getHeaders(accessToken=accessToken)
+    })
+}
+
+
+function _apiShowVersionWarn(jsonResponse){
+    /// @description Makes API request with given handlers.
+    if (jsonResponse && "v" in jsonResponse){
+        if (jsonResponse["v"] != AUTH_API_EXPECTED_VERSION){
+            console.warn("[Florgon auth API] Working with unexpected API version! Expected version: " + AUTH_API_EXPECTED_VERSION + ", but got: " + jsonResponse["v"])
+        }
+    }
+}
 
 function _buildRequestURL(apiMethod, apiParams){
     /// @description Returns ready request URL for auth API.
@@ -164,9 +166,12 @@ function _buildRequestURL(apiMethod, apiParams){
 function _getHeaders(accessToken){
     /// @description Returns headers object for request.
     let headers = AUTH_API_DEFAULT_HEADERS;
+
     if (accessToken){
+        // Send authorization headers.
         headers["Authorization"] = accessToken;
     }
+
     return headers;
 }
 
