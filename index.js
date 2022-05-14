@@ -6,9 +6,9 @@
     Used for working with Florgon auth API.
 
     Current SDK version:
-        v4.0.0
+        v0.2.0
     Expected auth API version: 
-        v1.2.3
+        v0.2.0
 
     Source code:
         https://github.com/florgon/auth-sdk
@@ -22,8 +22,8 @@
 */
 
 // Settings.
-const AUTH_API_EXPECTED_VERSION = "1.2.3";
-const AUTH_API_ENDPOINT_URL = "https://api.florgon.space/auth/v1/";
+const AUTH_API_EXPECTED_VERSION = "0.2.0";
+const AUTH_API_ENDPOINT_URL = "https://api.florgon.space/auth/v2/";
 const AUTH_API_HTTP_METHOD = "GET";
 const AUTH_API_DEFAULT_HEADERS = {
     "Content-Type": "application/json",
@@ -55,40 +55,48 @@ const authApiErrorCode = {
     API_INVALID_REQUEST: 40,
     API_NOT_IMPLEMENTED: 41,
 
-    CFT_INVALID_TOKEN: 50,
-    CFT_EMAIL_NOT_FOUND:  51,
-    CFT_EMAIL_ALREADY_CONFIRMED: 52,
+    EMAIL_CONFIRMATION_TOKEN_INVALID: 50,
+    EMAIL_CONFIRMATION_USER_NOT_FOUND:  51,
+    EMAIL_CONFIRMATION_ALREADY_CONFIRMED: 52,
     
     OAUTH_CLIENT_NOT_FOUND: 60,
     OAUTH_CLIENT_FORBIDDEN: 61,
+    OAUTH_CLIENT_REDIRECT_URI_MISMATCH: 62,
+    OAUTH_CLIENT_ID_MISMATCH: 63,
+    OAUTH_CLIENT_SECRET_MISMATCH: 64,
+
+    USER_DEACTIVATED: 100,
 }
 
 
+
 // Methods wrapper.
-// Other.
-const authMethodChangelog = () => authApiRequest("changelog", "", "");
-// User / token.
-const authMethodVerify = (accessToken) => authApiRequest("verify", "", accessToken);
-const authMethodUser = (accessToken) => authApiRequest("user", "", accessToken);
-// Sign-in/up
-const authMethodSignin = (login, password) => authApiRequest("signin", "login=" + login + "&password=" + password, "");
-const authMethodSignup = (username, email, password) => authApiRequest("signup", "username=" + username + "&email=" + email + "&password=" + password, "");
+// User.
+const authMethodUserGetInfo = (accessToken) => authApiRequest("user.getInfo", "", accessToken);
+const authMethodUserSetInfo = (accessToken) => authApiRequest("user.setInfo", "", accessToken);
+// Session.
+const _authMethodSessionSignin = (login, password) => authApiRequest("_session._signin", `login=${login}&password=${password}`, "");
+const _authMethodSessionSignup = (username, email, password) => authApiRequest("_session._signup", `username=${username}&email=${email}&password=${password}`, "");
+const _authMethodSessionGetUserInfo = (sessionToken) => authApiRequest("_session._getUserInfo", `session_token=${sessionToken}`, "");
 // Email.
-const authMethodEmailConfirm = (confirmationToken) => authApiRequest("email/confirm", "cft=" + confirmationToken, "");
-const authMethodEmailResendConfirmation = (accessToken) => authApiRequest("email/resend_confirmation", "", accessToken);
+const _authMethodEmailConfirmationConfirm = (confirmationToken) => authApiRequest("_emailConfirmation.confirm", `cft=${confirmationToken}`, "");
+const _authMethodEmailConfirmationResend = (accessToken) => authApiRequest("_emailConfirmation.resend", "", accessToken);
 // OAuth.
-const authMethodOAuthAuthorize = (clientId, redirectUri, responseType, scope, state) => authApiRequest("oauth/authorize", `client_id=${clientId}&state=${state}&redirect_uri=${redirectUri}&scope=${scope}&response_type=${responseType}`, "");
-const authMethodOAuthToken = (code) => authApiRequest("oauth/token", "code=" + code, "");
-const authMethodOAuthDirect = (clientId, clientSecret, username, email, password) => authApiRequest("oauth/direct", `client_id=${clientId}&client_secret=${clientSecret}&username=${username}&email=${email}&password=${password}`, "");
+const authMethodOAuthAuthorize = (clientId, redirectUri, responseType, scope, state) => authApiRequest("oauth.authorize", `client_id=${clientId}&state=${state}&redirect_uri=${redirectUri}&scope=${scope}&response_type=${responseType}`, "");
+const authMethodOAuthAccessToken = (code, clientId, clientSecret, redirectUri) => authApiRequest("oauth.accessToken", `code=${code}&client_id=${clientId}client_secret=${clientSecret}&redirect_uri=${redirectUri}`, "");
+const _authMethodOAuthAllowClient = (sessionToken, clientId, state, redirectUri, scope, responseType) => authApiRequest("_oauth._allowClient", `client_id=${clientId}&session_token=${sessionToken}&state=${state}&redirect_uri=${redirectUri}&scope=${scope}&response_type=${responseType}`, "");
+
 // OAuth client.
-const authMethodOAuthClientGet = (clientId) => authApiRequest("oauth/client/get", "client_id=" + clientId, "");
-const authMethodOAuthClientNew = (displayName, accessToken) => authApiRequest("oauth/client/new", "display_name=" + displayName, accessToken);
-const authMethodOAuthClientExpire = (clientId, accessToken) => authApiRequest("oauth/client/expire", "client_id=" + clientId, accessToken);
+const authMethodOAuthClientGet = (clientId) => authApiRequest("oauthClient.get", `client_id=${clientId}`, "");
+const authMethodOAuthClientList = (accessToken) => authApiRequest("oauthClient.list", "", accessToken);
+const authMethodOAuthClientNew = (displayName, accessToken) => authApiRequest("oauthClient.new", `display_name=${displayName}`, accessToken);
+const authMethodOAuthClientExpireSecret = (clientId, accessToken) => authApiRequest("oauthClient.expireSecret", `client_id=${clientId}`, accessToken);
+const authMethodOAuthClientEdit = (clientId, accessToken, displayName="", displayAvatar="") => authApiRequest("oauthClient.edit", `client_id=${clientId}&display_name=${displayName}&display_avatar=${displayAvatar}`, accessToken);
 
 // Getter for OAuth authorization url.
 // Use this for own redirect, or method below to direct redirect.
 function authApiGetOAuthAuthorizationUrl(clientId, redirectUri, responseType="token", scope="", state=""){
-    return _buildRequestURL("oauth/authorize", `client_id=${clientId}&state=${state}&redirect_uri=${redirectUri}&scope=${scope}&response_type=${responseType}`)
+    return _buildRequestURL("oauth.authorize", `client_id=${clientId}&state=${state}&redirect_uri=${redirectUri}&scope=${scope}&response_type=${responseType}`)
 }
 function authApiRedirectOAuthAuthorization(clientId, redirectUri, responseType="token", scope="", state=""){
     window.location.href = authApiGetOAuthAuthorizationUrl(clientId, redirectUri, responseType, scope, state);
@@ -100,7 +108,6 @@ function authApiRequest(method, params="", accessToken=""){
         _apiFetch(method, params, accessToken).then((httpResponse) => {
             httpResponse.json().then((jsonResponse) => {
                 _apiShowVersionWarn(jsonResponse);
-                
                 if ("success" in jsonResponse) resolve(jsonResponse, httpResponse);
                 reject(jsonResponse, httpResponse);
             }).catch(reject);
@@ -126,11 +133,17 @@ function authApiGetErrorMessageFromCode(code){
         case 32: return "auth-api-error-username-invalid" // AUTH_USERNAME_INVALID
         case 40: return "auth-api-error-invalid-request" // API_INVALID_REQUEST
         case 41: return "auth-api-error-not-implemented" // API_NOT_IMPLEMENTED
-        case 50: return "auth-api-error-cft-invalid-token" // CFT_INVALID_TOKEN
-        case 51: return "auth-api-error-cft-email-not-found" // CFT_EMAIL_NOT_FOUND
-        case 52: return "auth-api-error-cft-email-already-confirmed" // CFT_EMAIL_ALREADY_CONFIRMED
+        case 50: return "auth-api-error-email-confirmation_token-invalid" // EMAIL_CONFIRMATION_TOKEN_INVALID
+        case 51: return "auth-api-error-email-confirmation-user-not-found" // EMAIL_CONFIRMATION_USER_NOT_FOUND
+        case 52: return "auth-api-error-email-confirmation-already-confirmed" // EMAIL_CONFIRMATION_ALREADY_CONFIRMED
         case 60: return "auth-api-error-oauth-client-not-found" // OAUTH_CLIENT_NOT_FOUND
         case 61: return "auth-api-error-oauth-client-forbidden" // OAUTH_CLIENT_FORBIDDEN
+
+        case 62: return "auth-api-error-oauth-client-redirect-uri-mismatch" // OAUTH_CLIENT_REDIRECT_URI_MISMATCH
+        case 63: return "auth-api-error-oauth-client-id-mismatch" // OAUTH_CLIENT_ID_MISMATCH
+        case 64: return "auth-api-error-oauth-client-secret-mismatch" // OAUTH_CLIENT_SECRET_MISMATCH
+
+        case 100: return "auth-api-error-user-deactivated" // USER_DEACTIVATED
         default: return "auth-api-error-unknown"; // Unknown error code.
     }
 }
@@ -176,28 +189,28 @@ function _getHeaders(accessToken){
 }
 
 module.exports = {
-    authApiGetErrorMessageFromCode,
-
     authApiErrorCode,
+    authApiGetErrorMessageFromCode,
 
     authApiRedirectOAuthAuthorization,
     authApiGetOAuthAuthorizationUrl,
 
     authApiRequest,
 
+    _authMethodEmailConfirmationConfirm,
+    _authMethodEmailConfirmationResend,
+    _authMethodOAuthAllowClient,
+    _authMethodSessionSignin,
+    _authMethodSessionSignup,
+    _authMethodSessionGetUserInfo,
 
-    authMethodUser,
-    authMethodSignin,
-    authMethodSignup,
-    authMethodVerify,
-    authMethodChangelog,
-    authMethodEmailConfirm,
-    authMethodEmailResendConfirmation,
-
-    authMethodOAuthDirect,
+    authMethodOAuthAccessToken,
     authMethodOAuthAuthorize,
-    authMethodOAuthToken,
+    authMethodOAuthClientEdit,
+    authMethodOAuthClientExpireSecret,
     authMethodOAuthClientGet,
+    authMethodOAuthClientList,
     authMethodOAuthClientNew,
-    authMethodOAuthClientExpire,
+    authMethodUserGetInfo,
+    authMethodUserSetInfo
 };
