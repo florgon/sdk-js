@@ -6,7 +6,7 @@
     Used for working with Florgon auth API.
 
     Current SDK version:
-        v0.2.0
+        v0.2.1
     Expected auth API version: 
         v0.2.0
 
@@ -51,6 +51,7 @@ const authApiErrorCode = {
     AUTH_EMAIL_INVALID: 30,
     AUTH_PASSWORD_INVALID: 31,
     AUTH_USERNAME_INVALID: 32,
+    AUTH_INSUFFICIENT_PERMISSSIONS: 33,
 
     API_INVALID_REQUEST: 40,
     API_NOT_IMPLEMENTED: 41,
@@ -66,6 +67,7 @@ const authApiErrorCode = {
     OAUTH_CLIENT_SECRET_MISMATCH: 64,
 
     USER_DEACTIVATED: 100,
+    USER_EMAIL_NOT_CONFIRMED: 101,
 }
 
 
@@ -124,26 +126,35 @@ function authApiGetErrorMessageFromCode(code){
     switch(code){
         case 0: return "auth-api-error-username-taken" // AUTH_USERNAME_TAKEN
         case 1: return "auth-api-error-email-taken" // AUTH_EMAIL_TAKEN
+
         case 10: return "auth-api-error-invalid-token" // AUTH_INVALID_TOKEN
         case 11: return "auth-api-error-expired-token" // AUTH_EXPIRED_TOKEN
+
         case 20: return "auth-api-error-invalid-credentials" // AUTH_INVALID_CREDENTIALS
         case 21: return "auth-api-error-auth-required" // AUTH_REQUIRED
         case 30: return "auth-api-error-email-invalid" // AUTH_EMAIL_INVALID
         case 31: return "auth-api-error-password-invalid" // AUTH_PASSWORD_INVALID
         case 32: return "auth-api-error-username-invalid" // AUTH_USERNAME_INVALID
+        case 33: return "auth-api-error-insufficient-permissions" // AUTH_INSUFFICIENT_PERMISSSIONS
+
         case 40: return "auth-api-error-invalid-request" // API_INVALID_REQUEST
         case 41: return "auth-api-error-not-implemented" // API_NOT_IMPLEMENTED
+        case 42: return "auth-api-error-internal-server-error" // API_INTERNAL_SERVER_ERROR
+        case 43: return "auth-api-error-method-not-found" // API_METHOD_NOT_FOUND
+
         case 50: return "auth-api-error-email-confirmation_token-invalid" // EMAIL_CONFIRMATION_TOKEN_INVALID
         case 51: return "auth-api-error-email-confirmation-user-not-found" // EMAIL_CONFIRMATION_USER_NOT_FOUND
         case 52: return "auth-api-error-email-confirmation-already-confirmed" // EMAIL_CONFIRMATION_ALREADY_CONFIRMED
+
         case 60: return "auth-api-error-oauth-client-not-found" // OAUTH_CLIENT_NOT_FOUND
         case 61: return "auth-api-error-oauth-client-forbidden" // OAUTH_CLIENT_FORBIDDEN
-
         case 62: return "auth-api-error-oauth-client-redirect-uri-mismatch" // OAUTH_CLIENT_REDIRECT_URI_MISMATCH
         case 63: return "auth-api-error-oauth-client-id-mismatch" // OAUTH_CLIENT_ID_MISMATCH
         case 64: return "auth-api-error-oauth-client-secret-mismatch" // OAUTH_CLIENT_SECRET_MISMATCH
 
         case 100: return "auth-api-error-user-deactivated" // USER_DEACTIVATED
+        case 101: return "auth-api-error-user-email-not-confirmed" // USER_EMAIL_NOT_CONFIRMED
+        
         default: return "auth-api-error-unknown"; // Unknown error code.
     }
 }
