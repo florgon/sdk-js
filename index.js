@@ -6,9 +6,9 @@
     Used for working with Florgon auth API.
 
     Current SDK version:
-        v0.2.1
+        v0.2.2
     Expected auth API version: 
-        v0.2.0
+        v0.2.0-beta
 
     Source code:
         https://github.com/florgon/auth-sdk
@@ -22,7 +22,7 @@
 */
 
 // Settings.
-const AUTH_API_EXPECTED_VERSION = "0.2.0";
+const AUTH_API_EXPECTED_VERSION = "0.2.0-beta";
 const AUTH_API_ENDPOINT_URL = "https://api.florgon.space/auth/v2/";
 const AUTH_API_HTTP_METHOD = "GET";
 const AUTH_API_DEFAULT_HEADERS = {
@@ -68,6 +68,7 @@ const authApiErrorCode = {
 
     USER_DEACTIVATED: 100,
     USER_EMAIL_NOT_CONFIRMED: 101,
+    USER_NOT_FOUND: 102,
 }
 
 
@@ -75,18 +76,37 @@ const authApiErrorCode = {
 // Methods wrapper.
 // User.
 const authMethodUserGetInfo = (accessToken) => authApiRequest("user.getInfo", "", accessToken);
-const authMethodUserSetInfo = (accessToken) => authApiRequest("user.setInfo", "", accessToken);
+const authMethodUserSetInfo = (accessToken, firstName=undefined, lastName=undefined, sex=undefined, avatarUrl=undefined) => {
+    let params = "";
+    if (firstName !== undefined) params = `first_name=${firstName}`;
+    if (lastName !== undefined) params = `last_name=${lastName}`;
+    if (sex !== undefined) params = `sex=${sex}`;
+    if (avatarUrl !== undefined) params = `avatar_url=${avatarUrl}`;
+    return authApiRequest("user.setInfo", params, accessToken);
+} 
+const authMethodUserProfileGetInfo = (userId=undefined, username=undefined) => {
+    let params = "";
+    if (userId !== undefined) params = `user_id=${userId}`;
+    if (username !== undefined) params = `user_id=${username}`;
+    return authApiRequest("user.getProfileInfo", params, "");
+}
+
 // Session.
 const _authMethodSessionSignin = (login, password) => authApiRequest("_session._signin", `login=${login}&password=${password}`, "");
 const _authMethodSessionSignup = (username, email, password) => authApiRequest("_session._signup", `username=${username}&email=${email}&password=${password}`, "");
 const _authMethodSessionGetUserInfo = (sessionToken) => authApiRequest("_session._getUserInfo", `session_token=${sessionToken}`, "");
+
 // Email.
 const _authMethodEmailConfirmationConfirm = (confirmationToken) => authApiRequest("_emailConfirmation.confirm", `cft=${confirmationToken}`, "");
 const _authMethodEmailConfirmationResend = (accessToken) => authApiRequest("_emailConfirmation.resend", "", accessToken);
+
 // OAuth.
 const authMethodOAuthAuthorize = (clientId, redirectUri, responseType, scope, state) => authApiRequest("oauth.authorize", `client_id=${clientId}&state=${state}&redirect_uri=${redirectUri}&scope=${scope}&response_type=${responseType}`, "");
 const authMethodOAuthAccessToken = (code, clientId, clientSecret, redirectUri) => authApiRequest("oauth.accessToken", `code=${code}&client_id=${clientId}client_secret=${clientSecret}&redirect_uri=${redirectUri}`, "");
 const _authMethodOAuthAllowClient = (sessionToken, clientId, state, redirectUri, scope, responseType) => authApiRequest("_oauth._allowClient", `client_id=${clientId}&session_token=${sessionToken}&state=${state}&redirect_uri=${redirectUri}&scope=${scope}&response_type=${responseType}`, "");
+
+// Utils.
+const authMethodUtilsGetServerTime = () => authApiRequest("utils.getServerTime", "", "");
 
 // OAuth client.
 const authMethodOAuthClientGet = (clientId) => authApiRequest("oauthClient.get", `client_id=${clientId}`, "");
@@ -154,8 +174,8 @@ function authApiGetErrorMessageFromCode(code){
 
         case 100: return "auth-api-error-user-deactivated" // USER_DEACTIVATED
         case 101: return "auth-api-error-user-email-not-confirmed" // USER_EMAIL_NOT_CONFIRMED
-        
-        default: return "auth-api-error-unknown"; // Unknown error code.
+        case 102: return "auth-api-error-user-not-found" // USER_NOT_FOUND
+        default: return "auth-api-error-unknown" // Unknown error code.
     }
 }
 
@@ -223,5 +243,7 @@ module.exports = {
     authMethodOAuthClientList,
     authMethodOAuthClientNew,
     authMethodUserGetInfo,
-    authMethodUserSetInfo
+    authMethodUserSetInfo,
+    authMethodUserProfileGetInfo,
+    authMethodUtilsGetServerTime
 };
