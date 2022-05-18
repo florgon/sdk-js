@@ -6,7 +6,7 @@
     Used for working with Florgon auth API.
 
     Current SDK version:
-        v0.2.2
+        v0.2.3
     Expected auth API version: 
         v0.2.0-beta
 
@@ -87,7 +87,7 @@ const authMethodUserSetInfo = (accessToken, firstName=undefined, lastName=undefi
 const authMethodUserProfileGetInfo = (userId=undefined, username=undefined) => {
     let params = "";
     if (userId !== undefined) params = `user_id=${userId}`;
-    if (username !== undefined) params = `user_id=${username}`;
+    if (username !== undefined) params = `username=${username}`;
     return authApiRequest("user.getProfileInfo", params, "");
 }
 
