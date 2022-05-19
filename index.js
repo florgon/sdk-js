@@ -6,7 +6,7 @@
     Used for working with Florgon auth API.
 
     Current SDK version:
-        v0.2.3
+        v0.2.4
     Expected auth API version: 
         v0.2.0-beta
 
@@ -14,11 +14,11 @@
         https://github.com/florgon/auth-sdk
     
     API documentation:
-        https://github.com/florgon/auth-api/docs
+        https://dev.florgon.space/apis/auth
     
     Homepages:
         https://profile.florgon.space/
-        https://auth.florgon.space/
+        https://oauth.florgon.space/
 */
 
 // Settings.
@@ -36,7 +36,7 @@ const AUTH_API_DEFAULT_HEADERS = {
 
 
 // See all methods in documentation:
-// https://github.com/florgon/auth-api/blob/main/docs/API_METHODS.md
+// https://dev.florgon.space/apis/auth
 
 // Error codes.
 const authApiErrorCode = {
@@ -69,11 +69,16 @@ const authApiErrorCode = {
     USER_DEACTIVATED: 100,
     USER_EMAIL_NOT_CONFIRMED: 101,
     USER_NOT_FOUND: 102,
+    USER_PROFILE_PRIVATE: 103,
+    USER_PROFILE_AUTH_REQUIRED: 104
 }
 
 
 
 // Methods wrapper.
+// See all methods in documentation: 
+// https://dev.florgon.space/apis/auth
+
 // User.
 const authMethodUserGetInfo = (accessToken) => authApiRequest("user.getInfo", "", accessToken);
 const authMethodUserSetInfo = (accessToken, firstName=undefined, lastName=undefined, sex=undefined, avatarUrl=undefined) => {
@@ -90,7 +95,7 @@ const authMethodUserProfileGetInfo = (userId=undefined, username=undefined) => {
     if (username !== undefined) params = `username=${username}`;
     return authApiRequest("user.getProfileInfo", params, "");
 }
-
+const authMethodUserProfileSetInfo = (accessToken) => authApiRequest("user.setProfileInfo", "", accessToken);
 // Session.
 const _authMethodSessionSignin = (login, password) => authApiRequest("_session._signin", `login=${login}&password=${password}`, "");
 const _authMethodSessionSignup = (username, email, password) => authApiRequest("_session._signup", `username=${username}&email=${email}&password=${password}`, "");
@@ -175,6 +180,9 @@ function authApiGetErrorMessageFromCode(code){
         case 100: return "auth-api-error-user-deactivated" // USER_DEACTIVATED
         case 101: return "auth-api-error-user-email-not-confirmed" // USER_EMAIL_NOT_CONFIRMED
         case 102: return "auth-api-error-user-not-found" // USER_NOT_FOUND
+        case 103: return "auth-api-error-user-profile-private" // USER_PROFILE_PRIVATE
+        case 104: return "auth-api-error-user-profile-auth-required" // USER_PROFILE_AUTH_REQUIRED
+
         default: return "auth-api-error-unknown" // Unknown error code.
     }
 }
@@ -200,6 +208,7 @@ function _apiShowVersionWarn(jsonResponse){
         }
     }
 }
+
 
 function _buildRequestURL(apiMethod, apiParams){
     /// @description Returns ready request URL for auth API.
@@ -245,5 +254,6 @@ module.exports = {
     authMethodUserGetInfo,
     authMethodUserSetInfo,
     authMethodUserProfileGetInfo,
+    authMethodUserProfileSetInfo,
     authMethodUtilsGetServerTime
 };
