@@ -6,7 +6,7 @@
     Used for working with Florgon auth API.
 
     Current SDK version:
-        v0.2.4
+        v0.2.5
     Expected auth API version: 
         v0.2.0-beta
 
@@ -23,7 +23,7 @@
 
 // Settings.
 const AUTH_API_EXPECTED_VERSION = "0.2.0-beta";
-const AUTH_API_ENDPOINT_URL = "https://api.florgon.space/auth/v2/";
+const AUTH_API_ENDPOINT_URL = "https://api.florgon.space/";
 const AUTH_API_HTTP_METHOD = "GET";
 const AUTH_API_DEFAULT_HEADERS = {
     "Content-Type": "application/json",
