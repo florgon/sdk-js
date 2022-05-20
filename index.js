@@ -1,9 +1,9 @@
 /*
     `florgon-auth-api`
 
-    Florgon auth API library.
+    Florgon API library.
 
-    Used for working with Florgon auth API.
+    Used for working with Florgon API.
 
     Current SDK version:
         v0.2.5

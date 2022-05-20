@@ -1,6 +1,6 @@
 {
   "name": "@kirillzhosul/florgon-auth-api",
-  "version": "0.2.5",
+  "version": "0.2.5b",
   "description": "JavaScript SDK for Florgon authentication API.",
   "main": "index.js",
   "scripts": {
