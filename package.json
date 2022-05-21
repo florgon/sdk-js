@@ -1,6 +1,6 @@
 {
   "name": "@kirillzhosul/florgon-auth-api",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "JavaScript SDK for Florgon authentication API.",
   "main": "index.js",
   "scripts": {
@@ -17,8 +17,5 @@
   ],
   "author": "Kirill Zhosul",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/florgon/auth-sdk/issues"
-  },
   "homepage": "https://github.com/florgon/auth-sdk#readme"
 }

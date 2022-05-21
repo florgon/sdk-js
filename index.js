@@ -96,19 +96,10 @@ const authMethodUserProfileGetInfo = (userId=undefined, username=undefined) => {
     return authApiRequest("user.getProfileInfo", params, "");
 }
 const authMethodUserProfileSetInfo = (accessToken) => authApiRequest("user.setProfileInfo", "", accessToken);
-// Session.
-const _authMethodSessionSignin = (login, password) => authApiRequest("_session._signin", `login=${login}&password=${password}`, "");
-const _authMethodSessionSignup = (username, email, password) => authApiRequest("_session._signup", `username=${username}&email=${email}&password=${password}`, "");
-const _authMethodSessionGetUserInfo = (sessionToken) => authApiRequest("_session._getUserInfo", `session_token=${sessionToken}`, "");
-
-// Email.
-const _authMethodEmailConfirmationConfirm = (confirmationToken) => authApiRequest("_emailConfirmation.confirm", `cft=${confirmationToken}`, "");
-const _authMethodEmailConfirmationResend = (accessToken) => authApiRequest("_emailConfirmation.resend", "", accessToken);
 
 // OAuth.
 const authMethodOAuthAuthorize = (clientId, redirectUri, responseType, scope, state) => authApiRequest("oauth.authorize", `client_id=${clientId}&state=${state}&redirect_uri=${redirectUri}&scope=${scope}&response_type=${responseType}`, "");
 const authMethodOAuthAccessToken = (code, clientId, clientSecret, redirectUri) => authApiRequest("oauth.accessToken", `code=${code}&client_id=${clientId}client_secret=${clientSecret}&redirect_uri=${redirectUri}`, "");
-const _authMethodOAuthAllowClient = (sessionToken, clientId, state, redirectUri, scope, responseType) => authApiRequest("_oauth._allowClient", `client_id=${clientId}&session_token=${sessionToken}&state=${state}&redirect_uri=${redirectUri}&scope=${scope}&response_type=${responseType}`, "");
 
 // Utils.
 const authMethodUtilsGetServerTime = () => authApiRequest("utils.getServerTime", "", "");
@@ -236,13 +227,6 @@ module.exports = {
     authApiGetOAuthAuthorizationUrl,
 
     authApiRequest,
-
-    _authMethodEmailConfirmationConfirm,
-    _authMethodEmailConfirmationResend,
-    _authMethodOAuthAllowClient,
-    _authMethodSessionSignin,
-    _authMethodSessionSignup,
-    _authMethodSessionGetUserInfo,
 
     authMethodOAuthAccessToken,
     authMethodOAuthAuthorize,
