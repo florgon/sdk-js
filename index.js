@@ -7,7 +7,7 @@
     Used for working with Florgon API.
 
     Current SDK version:
-        v0.2.8
+        v0.2.9
     Expected API version: 
         v0.2.0-beta
 
@@ -247,7 +247,7 @@ function _getHeaders(accessToken){
     /// @description Returns headers object for request.
     let headers = AUTH_API_DEFAULT_HEADERS;
 
-    if ((accessToken !=== undefined) && accessToken){
+    if ((accessToken !== undefined) && accessToken){
         // Send authorization headers.
         headers["Authorization"] = accessToken;
     }
