@@ -1,23 +1,24 @@
 /*
     `florgon-auth-api`
+    (Will be renamed in the future)
 
-    Florgon auth API library.
+    Florgon API library.
 
-    Used for working with Florgon auth API.
+    Used for working with Florgon API.
 
     Current SDK version:
-        v0.2.5
-    Expected auth API version: 
+        v0.2.7
+    Expected API version: 
         v0.2.0-beta
 
     Source code:
-        https://github.com/florgon/auth-sdk
+        https://github.com/florgon/sdk-js
     
     API documentation:
         https://dev.florgon.space/apis/auth
     
     Homepages:
-        https://profile.florgon.space/
+        https://florgon.space/profile
         https://oauth.florgon.space/
 */
 
@@ -40,12 +41,15 @@ const AUTH_API_DEFAULT_HEADERS = {
 
 // Error codes.
 const authApiErrorCode = {
+    // Auth taken.
     AUTH_USERNAME_TAKEN: 0,
     AUTH_EMAIL_TAKEN: 1,
 
+    // Auth token.
     AUTH_INVALID_TOKEN: 10,
     AUTH_EXPIRED_TOKEN:  11,
 
+    // Auth.
     AUTH_INVALID_CREDENTIALS: 20,
     AUTH_REQUIRED: 21,
     AUTH_EMAIL_INVALID: 30,
@@ -53,27 +57,44 @@ const authApiErrorCode = {
     AUTH_USERNAME_INVALID: 32,
     AUTH_INSUFFICIENT_PERMISSSIONS: 33,
 
+    // API.
     API_INVALID_REQUEST: 40,
     API_NOT_IMPLEMENTED: 41,
+    API_INTERNAL_SERVER_ERROR: 42,
+    API_METHOD_NOT_FOUND: 43,
+    API_TOO_MANY_REQUESTS: 44,
+    API_FORBIDDEN: 45,
+    API_UNKNOWN_ERROR: 46,
 
+    // Email confirmation.
     EMAIL_CONFIRMATION_TOKEN_INVALID: 50,
     EMAIL_CONFIRMATION_USER_NOT_FOUND:  51,
     EMAIL_CONFIRMATION_ALREADY_CONFIRMED: 52,
     
+    // Oauth client.
     OAUTH_CLIENT_NOT_FOUND: 60,
     OAUTH_CLIENT_FORBIDDEN: 61,
     OAUTH_CLIENT_REDIRECT_URI_MISMATCH: 62,
     OAUTH_CLIENT_ID_MISMATCH: 63,
     OAUTH_CLIENT_SECRET_MISMATCH: 64,
 
+    // User.
     USER_DEACTIVATED: 100,
     USER_EMAIL_NOT_CONFIRMED: 101,
     USER_NOT_FOUND: 102,
     USER_PROFILE_PRIVATE: 103,
-    USER_PROFILE_AUTH_REQUIRED: 104
+    USER_PROFILE_AUTH_REQUIRED: 104,
+
+    // Gifts.
+    GIFT_EXPIRED: 700,
+    GIFT_USED: 701,
+    GIFT_CANNOT_ACCEPTED: 702,
+
+    // 2FA OTP.
+    AUTH_TFA_OTP_REQUIRED:  800,
+    AUTH_TFA_OTP_INVALID:  801, 
+    AUTH_TFA_NOT_ENABLED:  802, 
 }
-
-
 
 // Methods wrapper.
 // See all methods in documentation: 
@@ -103,6 +124,9 @@ const authMethodOAuthAccessToken = (code, clientId, clientSecret, redirectUri) =
 
 // Utils.
 const authMethodUtilsGetServerTime = () => authApiRequest("utils.getServerTime", "", "");
+
+// Gifts.
+const authMethodGiftAccept = (promocode, accessToken) => authApiRequest("gift.accept", `promocode=${promocode}`, accessToken);
 
 // OAuth client.
 const authMethodOAuthClientGet = (clientId) => authApiRequest("oauthClient.get", `client_id=${clientId}`, "");
@@ -136,45 +160,57 @@ function authApiRequest(method, params="", accessToken=""){
 function authApiGetErrorMessageFromCode(code){
     /// @description Returns translation message from code.
 
-    // See auth-api documentation:
-    // https://github.com/florgon/auth-api/blob/main/docs/API_ERROR_CODES.md
+    // See error codes list at developer documentation.
+    // https://dev.florgon.space/apis/auth
 
     switch(code){
-        case 0: return "auth-api-error-username-taken" // AUTH_USERNAME_TAKEN
-        case 1: return "auth-api-error-email-taken" // AUTH_EMAIL_TAKEN
+        case 0: return "api-error-username-taken" // AUTH_USERNAME_TAKEN
+        case 1: return "api-error-email-taken" // AUTH_EMAIL_TAKEN
 
-        case 10: return "auth-api-error-invalid-token" // AUTH_INVALID_TOKEN
-        case 11: return "auth-api-error-expired-token" // AUTH_EXPIRED_TOKEN
+        case 10: return "api-error-invalid-token" // AUTH_INVALID_TOKEN
+        case 11: return "api-error-expired-token" // AUTH_EXPIRED_TOKEN
 
-        case 20: return "auth-api-error-invalid-credentials" // AUTH_INVALID_CREDENTIALS
-        case 21: return "auth-api-error-auth-required" // AUTH_REQUIRED
-        case 30: return "auth-api-error-email-invalid" // AUTH_EMAIL_INVALID
-        case 31: return "auth-api-error-password-invalid" // AUTH_PASSWORD_INVALID
-        case 32: return "auth-api-error-username-invalid" // AUTH_USERNAME_INVALID
-        case 33: return "auth-api-error-insufficient-permissions" // AUTH_INSUFFICIENT_PERMISSSIONS
+        case 20: return "api-error-invalid-credentials" // AUTH_INVALID_CREDENTIALS
+        case 21: return "api-error-auth-required" // AUTH_REQUIRED
+        case 30: return "api-error-email-invalid" // AUTH_EMAIL_INVALID
+        case 31: return "api-error-password-invalid" // AUTH_PASSWORD_INVALID
+        case 32: return "api-error-username-invalid" // AUTH_USERNAME_INVALID
+        case 33: return "api-error-insufficient-permissions" // AUTH_INSUFFICIENT_PERMISSSIONS
 
-        case 40: return "auth-api-error-invalid-request" // API_INVALID_REQUEST
-        case 41: return "auth-api-error-not-implemented" // API_NOT_IMPLEMENTED
-        case 42: return "auth-api-error-internal-server-error" // API_INTERNAL_SERVER_ERROR
-        case 43: return "auth-api-error-method-not-found" // API_METHOD_NOT_FOUND
+        case 40: return "api-error-invalid-request" // API_INVALID_REQUEST
+        case 41: return "api-error-not-implemented" // API_NOT_IMPLEMENTED
+        case 42: return "api-error-internal-server-error" // API_INTERNAL_SERVER_ERROR
+        case 43: return "api-error-method-not-found" // API_METHOD_NOT_FOUND
 
-        case 50: return "auth-api-error-email-confirmation_token-invalid" // EMAIL_CONFIRMATION_TOKEN_INVALID
-        case 51: return "auth-api-error-email-confirmation-user-not-found" // EMAIL_CONFIRMATION_USER_NOT_FOUND
-        case 52: return "auth-api-error-email-confirmation-already-confirmed" // EMAIL_CONFIRMATION_ALREADY_CONFIRMED
+        case 44: return "api-error-too-many-requests" // API_TOO_MANY_REQUESTS
+        case 45: return "api-error-access-denied" // API_FORBIDDEN
+        case 46: return "api-error-unknown-server-error" // API_UNKNOWN_ERROR
 
-        case 60: return "auth-api-error-oauth-client-not-found" // OAUTH_CLIENT_NOT_FOUND
-        case 61: return "auth-api-error-oauth-client-forbidden" // OAUTH_CLIENT_FORBIDDEN
-        case 62: return "auth-api-error-oauth-client-redirect-uri-mismatch" // OAUTH_CLIENT_REDIRECT_URI_MISMATCH
-        case 63: return "auth-api-error-oauth-client-id-mismatch" // OAUTH_CLIENT_ID_MISMATCH
-        case 64: return "auth-api-error-oauth-client-secret-mismatch" // OAUTH_CLIENT_SECRET_MISMATCH
+        case 50: return "api-error-email-confirmation_token-invalid" // EMAIL_CONFIRMATION_TOKEN_INVALID
+        case 51: return "api-error-email-confirmation-user-not-found" // EMAIL_CONFIRMATION_USER_NOT_FOUND
+        case 52: return "api-error-email-confirmation-already-confirmed" // EMAIL_CONFIRMATION_ALREADY_CONFIRMED
 
-        case 100: return "auth-api-error-user-deactivated" // USER_DEACTIVATED
-        case 101: return "auth-api-error-user-email-not-confirmed" // USER_EMAIL_NOT_CONFIRMED
-        case 102: return "auth-api-error-user-not-found" // USER_NOT_FOUND
-        case 103: return "auth-api-error-user-profile-private" // USER_PROFILE_PRIVATE
-        case 104: return "auth-api-error-user-profile-auth-required" // USER_PROFILE_AUTH_REQUIRED
+        case 60: return "api-error-oauth-client-not-found" // OAUTH_CLIENT_NOT_FOUND
+        case 61: return "api-error-oauth-client-forbidden" // OAUTH_CLIENT_FORBIDDEN
+        case 62: return "api-error-oauth-client-redirect-uri-mismatch" // OAUTH_CLIENT_REDIRECT_URI_MISMATCH
+        case 63: return "api-error-oauth-client-id-mismatch" // OAUTH_CLIENT_ID_MISMATCH
+        case 64: return "api-error-oauth-client-secret-mismatch" // OAUTH_CLIENT_SECRET_MISMATCH
 
-        default: return "auth-api-error-unknown" // Unknown error code.
+        case 100: return "api-error-user-deactivated" // USER_DEACTIVATED
+        case 101: return "api-error-user-email-not-confirmed" // USER_EMAIL_NOT_CONFIRMED
+        case 102: return "api-error-user-not-found" // USER_NOT_FOUND
+        case 103: return "api-error-user-profile-private" // USER_PROFILE_PRIVATE
+        case 104: return "api-error-user-profile-auth-required" // USER_PROFILE_AUTH_REQUIRED
+
+        case 700: return "api-error-gift-expired" // GIFT_EXPIRED
+        case 701: return "api-error-gift-used" // GIFT_USED
+        case 702: return "api-error-gift-cannot-accepted" // GIFT_CANNOT_ACCEPTED
+
+        case 800: return "api-error-tfa-otp-required" // AUTH_TFA_OTP_REQUIRED
+        case 801: return "api-error-tfa-otp-invalid" // AUTH_TFA_OTP_INVALID
+        case 802: return "api-error-tfa-not-enabled" // AUTH_TFA_NOT_ENABLED
+
+        default: return "api-error-unknown" // Unknown error code.
     }
 }
 
@@ -239,5 +275,6 @@ module.exports = {
     authMethodUserSetInfo,
     authMethodUserProfileGetInfo,
     authMethodUserProfileSetInfo,
-    authMethodUtilsGetServerTime
+    authMethodUtilsGetServerTime,
+    authMethodGiftAccept
 };

@@ -1,2 +1,2 @@
-# Florgon auth JS SDK.
-JavaScript SDK for Florgon authentication API.
+# Florgon JS SDK.
+JavaScript SDK for Florgon API.

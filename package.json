@@ -1,21 +1,21 @@
 {
   "name": "@kirillzhosul/florgon-auth-api",
-  "version": "0.2.6",
-  "description": "JavaScript SDK for Florgon authentication API.",
+  "version": "0.2.7",
+  "description": "JavaScript SDK for Florgon API.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/florgon/auth-sdk.git"
+    "url": "git+https://github.com/florgon/sdk-js.git"
   },
   "keywords": [
     "florgon",
     "auth",
     "sdk"
   ],
-  "author": "Kirill Zhosul",
+  "author": "Florgon (Kirill Zhosul)",
   "license": "MIT",
-  "homepage": "https://github.com/florgon/auth-sdk#readme"
+  "homepage": "https://github.com/florgon/sdk-js#readme"
 }
