@@ -7,7 +7,7 @@
     Used for working with Florgon API.
 
     Current SDK version:
-        v0.2.7
+        v0.2.8
     Expected API version: 
         v0.2.0-beta
 
