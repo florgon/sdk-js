@@ -110,11 +110,11 @@ const authMethodUserSetInfo = (accessToken, firstName=undefined, lastName=undefi
     if (avatarUrl !== undefined) params = `avatar_url=${avatarUrl}`;
     return authApiRequest("user.setInfo", params, accessToken);
 } 
-const authMethodUserProfileGetInfo = (userId=undefined, username=undefined) => {
+const authMethodUserProfileGetInfo = (userId=undefined, username=undefined, accessToken=undefined) => {
     let params = "";
     if (userId !== undefined) params = `user_id=${userId}`;
     if (username !== undefined) params = `username=${username}`;
-    return authApiRequest("user.getProfileInfo", params, "");
+    return authApiRequest("user.getProfileInfo", params, accessToken);
 }
 const authMethodUserProfileSetInfo = (accessToken) => authApiRequest("user.setProfileInfo", "", accessToken);
 
@@ -247,7 +247,7 @@ function _getHeaders(accessToken){
     /// @description Returns headers object for request.
     let headers = AUTH_API_DEFAULT_HEADERS;
 
-    if (accessToken){
+    if ((accessToken !=== undefined) && accessToken){
         // Send authorization headers.
         headers["Authorization"] = accessToken;
     }
