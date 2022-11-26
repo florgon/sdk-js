@@ -25,7 +25,7 @@
 // Settings.
 const AUTH_OAUTH_SCREEN_URL = "https://florgon.space/oauth/authorize";
 const AUTH_API_EXPECTED_VERSION = "0.0.1";
-const AUTH_API_ENDPOINT_URL = "https://api.florgon.space/";
+const AUTH_API_ENDPOINT_URL = "https://api.florgon.space/v1/";
 const AUTH_API_HTTP_METHOD = "GET";
 const AUTH_API_DEFAULT_HEADERS = {
   "Content-Type": "application/json",
