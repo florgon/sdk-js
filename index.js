@@ -1,13 +1,12 @@
 /*
-    `florgon-auth-api`
-    (Will be renamed in the future)
+    `florgon-sdk-js`
 
     Florgon API library.
 
     Used for working with Florgon API.
 
     Current SDK version:
-        v0.2.10
+        v0.2.11
     Expected API version: 
         v0.0.1
 
