@@ -241,20 +241,16 @@ function authDirectRedirectOAuthAuthorization(
 }
 function authApiRequest(method, params = "", accessToken = "") {
   /// @description Makes request to API method.
-  return new Promise((resolve, reject) => {
-    _apiFetch(method, params, accessToken)
-      .then((httpResponse) => {
-        httpResponse
-          .json()
-          .then((jsonResponse) => {
-            _apiShowVersionWarn(jsonResponse);
-            if ("success" in jsonResponse) resolve(jsonResponse, httpResponse);
-            reject(jsonResponse, httpResponse);
-          })
-          .catch(reject);
-      })
-      .catch(reject);
-  });
+  // TODO: Join with `authPostApiRequest`
+  return _wrapSentRequestPromise(_apiFetch(method, params, accessToken));
+}
+
+function authPostApiRequest(method, params = undefined, accessToken = "") {
+  /// @description Makes request to API method.
+  params ??= {};
+  return _wrapSentRequestPromise(
+    _apiFetch(method, params, accessToken, "POST")
+  );
 }
 
 function authApiGetErrorMessageFromCode(code) {
@@ -355,10 +351,38 @@ function authApiGetErrorMessageFromCode(code) {
     Private methods, that should not be used by end-user.
 */
 
-function _apiFetch(apiMethod, apiParams, accessToken) {
+function _wrapSentRequestPromise(promise) {
+  return new Promise((resolve, reject) => {
+    promise
+      .then((httpResponse) => {
+        httpResponse
+          .json()
+          .then((jsonResponse) => {
+            _apiShowVersionWarn(jsonResponse);
+            if ("success" in jsonResponse) resolve(jsonResponse, httpResponse);
+            reject(jsonResponse, httpResponse);
+          })
+          .catch(reject);
+      })
+      .catch(reject);
+  });
+}
+function _apiFetch(apiMethod, apiParams, accessToken, httpMethod = undefined) {
   /// @description Returns fetch for API.
-  return fetch(_buildRequestURL(apiMethod, apiParams), {
-    method: AUTH_API_HTTP_METHOD,
+
+  httpMethod ??= AUTH_API_HTTP_METHOD;
+  const httpUrl = _buildRequestURL(apiMethod, apiParams);
+  const httpHeaders = _getHeaders((accessToken = accessToken));
+  if (httpMethod == "POST") {
+    // TODO: Allow GET params?
+    return fetch(httpUrl, {
+      method: httpMethod,
+      headers: httpHeaders,
+      body: JSON.stringify(apiParams),
+    });
+  }
+  return fetch(httpUrl, {
+    method: httpMethod,
     headers: _getHeaders((accessToken = accessToken)),
   });
 }
@@ -404,6 +428,7 @@ module.exports = {
   authDirectGetOAuthAuthorizationUrl,
 
   authApiRequest,
+  authPostApiRequest,
 
   authMethodOAuthAccessToken,
   authMethodOAuthAuthorize,
